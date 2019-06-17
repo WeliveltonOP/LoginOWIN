@@ -4,7 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace LoginOWIN.App_Start
+namespace LoginOWIN.Controllers
 {
     [Authorize]
     public class HomeController : Controller
