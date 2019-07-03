@@ -1,0 +1,49 @@
+     Pesquisa por Verbo:
+        <div class="row">
+            @Html.TextBox("SearchString", ViewBag.CurrentFilter as string, new { @class = "form-control ml-3" })
+            <input type="submit" class="btn btn-secondary ml-2" value="Buscar" />
+        </div>
+        
+        
+        
+        
+        
+@{
+    var options = new PagedList.Mvc.PagedListRenderOptions();
+
+    options.ContainerDivClasses = new List<string> { "page" };
+
+    options.UlElementClasses = new List<string> { "pagination justify-content-center" };
+
+    options.LiElementClasses = new List<string> { "page-item" };
+
+}
+
+@using (Html.BeginForm("Index", "Verb", FormMethod.Post))
+{
+    @Html.DropDownList("pageSize", Riachuelo.Models.DefaultValues.ItemsPerPageList, new { @id = "pageSize", onchange = "this.form.submit();", @class = "form-control" })
+}
+@Html.PagedListPager(Model, page => Url.Action("Index", new { page, pageSize = ViewBag.CurrentItemsPerPage, searchString = ViewBag.CurrentFilter }), options)
+
+
+
+
+
+        public ActionResult Index(int? page = null, int? pageSize = null, string searchString = null)
+        {
+            ViewBag.CurrentFilter = searchString;
+
+            ViewBag.CurrentItemsPerPage = pageSize ?? 10; // default 10
+
+            var list = db.TCPD_VRBO.Include(t => t.TCPD_STCO);
+
+            if (!String.IsNullOrEmpty(searchString))
+            {
+                list = list.Where(l => l.NO_VRBO.ToUpper().Contains(searchString.ToUpper()));
+            }
+
+            //ViewBag.TipoSituacao = db.TBPWDR_TIPO_STCO.ToDictionary(t => t.CD_TIPO_STCO, t => t.DC_TIPO_STCO);
+
+            return View(list.OrderBy(t => t.NO_VRBO).ToPagedList(page ?? 1, pageSize ?? 10));
+
+        }
